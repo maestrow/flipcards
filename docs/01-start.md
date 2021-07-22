@@ -29,3 +29,40 @@ python
 django-admin startproject flipcards
 python manage.py runserver 8080
 python manage.py startapp fcards
+
+## Configure django with Postgres
+
+### Install postgresql-client and psycopg2
+
+source: https://www.enterprisedb.com/postgres-tutorials/how-use-postgresql-django
+
+To get Python working with Postgres, you will need to install the "psycopg2" module. However, you must first have pg_config installed on your OS.
+
+If you can’t find `pg_config` on your OS, you will need to install a Postgres client first. 
+
+```sh
+sudo apt install postgresql-client # may be unnecessary
+sudo apt install postgresql-common libpq-dev
+pg_config # check
+pip install psycopg2
+```
+
+### Db Settings
+
+```py
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'flipcards',
+        'USER': 'user',
+        'PASSWORD': 'password',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
+    }
+}
+```
+
+### Run initial migration
+
+`./manage.py migrate`
+
