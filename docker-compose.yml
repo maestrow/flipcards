@@ -1,0 +1,16 @@
+version: '3.1'
+
+services:
+  db:
+    image: postgres
+    container_name: flipcards-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      # Without PGDATA option dbdata folder, specified in volumes, will have owner systemd-coredump
+      PGDATA: /var/lib/postgresql/data/pgdata 
+    ports:
+      - "10101:5432"
+    volumes:
+      - ./dbdata:/var/lib/postgresql/data
