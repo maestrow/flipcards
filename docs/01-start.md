@@ -12,6 +12,8 @@ source ./venv/bin/activate
 
 ## Install Django
 
+Follow the [tutorial](https://docs.djangoproject.com/en/3.2/intro/tutorial01/)
+
 ```sh
 python -m pip install Django
 ```
@@ -66,3 +68,6 @@ DATABASES = {
 
 `./manage.py migrate`
 
+### Next: Create models
+
+Continue tutorial: https://docs.djangoproject.com/en/3.2/intro/tutorial02/
