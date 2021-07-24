@@ -9,5 +9,6 @@
   ],
   "python.formatting.autopep8Args": [
     "--indent-size=2"
-  ]
+  ],
+  "python.pythonPath": "/home/andrew/tmp/flipcards/django/venv/bin/python3"
 }

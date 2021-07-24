@@ -1,8 +1,10 @@
 from django.core.management.base import BaseCommand
 from fcards import models
+import curses
 
 class Command(BaseCommand):
-  def handle(self, *args, **kwargs):
+
+  def doStuff():
     print("Hello, world")
     card = models.Card(foreign="aaaa", meaning="bbb")
     card.save()
@@ -11,3 +13,16 @@ class Command(BaseCommand):
 
     print(first_card.foreign)
     print(first_card.meaning)
+
+  def window(self):
+    screen = curses.initscr()
+    for i in range(100):
+      screen.addstr('ojf oweifjo wiejf owiej foi, {}\n'.format(i))
+      screen.getch()
+    curses.endwin()
+
+  def handle(self, *args, **kwargs):
+    curses.wrapper(self.window())
+
+
+
