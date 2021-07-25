@@ -28,7 +28,7 @@ class Main(ttk.Frame):
     return frame
 
   def cardControl(self, container):
-    frame = ttk.Frame(container)
+    frame = ttk.Frame(container, padding=30)
     self.card(frame).grid(column=1, row=1, columnspan=3, sticky='nwes')
     ttk.Button(frame, text="bad").grid(row=2, column=1)
     ttk.Button(frame, text="good").grid(row=2, column=2)
