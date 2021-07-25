@@ -9,4 +9,3 @@ pip install -r requirements.txt
 
 # ToDo
 
-- избавиться от pycache
