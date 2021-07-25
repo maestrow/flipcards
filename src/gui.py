@@ -10,11 +10,11 @@ class Main(ttk.Frame):
     self.columnconfigure(1, weight=1)
     self.rowconfigure(2, weight=1)
 
-  def cardControl(self, container):
+  def card(self, container):
     s = ttk.Style()
-    s.configure('CardControl.TFrame', background='black')
+    s.configure('Card.TFrame', background='#BBBBBB')   # add background='black' to see frame area
 
-    frame = ttk.Frame(container, style='CardControl.TFrame')
+    frame = ttk.Frame(container, style='Card.TFrame')
     ttk.Label(frame, text="foreign").grid(column=1, row=1)
     text = """
     oiwjefoiwjef oio ijwoe ifjowef
@@ -25,6 +25,25 @@ class Main(ttk.Frame):
     frame.columnconfigure(1, weight=1)
     frame.rowconfigure(1, weight=1)
     frame.rowconfigure(2, weight=3)
+    return frame
+
+  def cardControl(self, container):
+    frame = ttk.Frame(container)
+    self.card(frame).grid(column=1, row=1, columnspan=3, sticky='nwes')
+    ttk.Button(frame, text="bad").grid(row=2, column=1)
+    ttk.Button(frame, text="good").grid(row=2, column=2)
+    ttk.Button(frame, text="excelent").grid(row=2, column=3)
+    frame.columnconfigure(1, weight=1)
+    frame.columnconfigure(2, weight=1)
+    frame.columnconfigure(3, weight=1)
+    frame.rowconfigure(1, weight=1)
+    return frame
+
+  def cardControl_(self, container):
+    frame = ttk.Frame(container)
+    self.card(frame).grid(sticky='nwes')
+    frame.columnconfigure(0, weight=1)
+    frame.rowconfigure(0, weight=1)
     return frame
 
   def left(self, container):
