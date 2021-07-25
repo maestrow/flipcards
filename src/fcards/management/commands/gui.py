@@ -26,12 +26,12 @@ class Main(ttk.Frame):
     self.columnconfigure(1, weight=1)
     self.rowconfigure(2, weight=1)
 
-  # Helpers
+  # === Helpers
 
   def currentCard(self):
     return self.cards[self.index]
 
-  # Actions
+  # === Actions
 
   def showCard(self, card):
     self.front.set(card.meaning)
@@ -49,20 +49,6 @@ class Main(ttk.Frame):
       card = self.cards[self.index - index - 1]
       self.showCard(card)
 
-  def rate(self, grade):
-    card = self.currentCard()
-    ratings = {
-      0: 'Incorrect response',
-      1: 'Correct response, after some hesitation',
-      2: 'Perfect recall'
-    }
-    self.lastGrade.set(ratings[grade])
-    self.wordsList.insert(0, '{} - {}'.format(card.meaning, card.foreign))
-
-    self.index += 1
-    self.hideBack()
-    self.showCurrentCard()
-
   def showBack(self):
     self.lblBack.grid()
     self.lblNotes.grid()
@@ -79,16 +65,43 @@ class Main(ttk.Frame):
     else:
       self.showBack()
 
+  def setStateForRateActions(self, state):
+    self.btnRateBad.state(state)
+    self.btnRateGood.state(state)
+    self.btnRateExcelent.state(state)
+
+  # === Event Handlers, Callbacks
+
+  def onRate(self, grade):
+    if self.wordsList.curselection():
+      return
+    card = self.currentCard()
+    ratings = {
+      0: 'Incorrect response',
+      1: 'Correct response, after some hesitation',
+      2: 'Perfect recall'
+    }
+    self.lastGrade.set(ratings[grade])
+    self.wordsList.insert(0, '{} - {}'.format(card.meaning, card.foreign))
+
+    self.index += 1
+    self.hideBack()
+    self.showCurrentCard()
+
   def onWordsListSelect(self, event):
+    self.setStateForRateActions(["disabled"])
+    self.btnContinue.state(["!disabled"])
     self.showBack()
     self.showSelectedHistoryCard()
 
   def onContinueClick(self, *args):
+    self.setStateForRateActions(["!disabled"])
+    self.btnContinue.state(["disabled"])
     self.wordsList.selection_clear(0, tk.END)
     self.hideBack()
     self.showCurrentCard()
 
-  # Widgets
+  # === Widgets
 
   def card(self, container):
     s = ttk.Style()
@@ -113,12 +126,12 @@ class Main(ttk.Frame):
   def cardControl(self, container):
     frame = ttk.Frame(container, padding=30)
     self.card(frame).grid(column=1, row=1, columnspan=3, sticky='nwes')
-    self.rateBad = ttk.Button(frame, text="bad", command=lambda *args: self.rate(0))
-    self.rateBad.grid(row=2, column=1)
-    self.rateGood = ttk.Button(frame, text="good", command=lambda *args: self.rate(1))
-    self.rateGood.grid(row=2, column=2)
-    self.rateExcelent = ttk.Button(frame, text="excelent", command=lambda *args: self.rate(2))
-    self.rateExcelent.grid(row=2, column=3)
+    self.btnRateBad = ttk.Button(frame, text="bad", command=lambda *args: self.onRate(0))
+    self.btnRateBad.grid(row=2, column=1)
+    self.btnRateGood = ttk.Button(frame, text="good", command=lambda *args: self.onRate(1))
+    self.btnRateGood.grid(row=2, column=2)
+    self.btnRateExcelent = ttk.Button(frame, text="excelent", command=lambda *args: self.onRate(2))
+    self.btnRateExcelent.grid(row=2, column=3)
     frame.columnconfigure(1, weight=1)
     frame.columnconfigure(2, weight=1)
     frame.columnconfigure(3, weight=1)
@@ -128,8 +141,8 @@ class Main(ttk.Frame):
   def stats(self, container):
     frame = ttk.Frame(container, padding=10)
     ttk.Label(frame, textvariable=self.lastGrade).grid()
-    # frame.columnconfigure(0, weight=1)
-    # frame.rowconfigure(0, weight=1)
+    frame.columnconfigure(0, weight=1)
+    frame.rowconfigure(0, weight=1)
     return frame
 
   def left(self, container):
@@ -146,7 +159,7 @@ class Main(ttk.Frame):
     self.wordsList = tk.Listbox(frame, height=5)
     self.wordsList.bind("<<ListboxSelect>>", self.onWordsListSelect)
     self.wordsList.grid(column=0, row=0, sticky='nwes')
-    self.btnContinue = tk.Button(frame, text="Continue", command=self.onContinueClick)
+    self.btnContinue = ttk.Button(frame, text="Continue", command=self.onContinueClick, state=["disabled"])
     self.btnContinue.grid(column=0, row=2, rowspan=2)
     s = ttk.Scrollbar(frame, orient=tk.VERTICAL, command=self.wordsList.yview)
     s.grid(column=1, row=0, sticky='ns')
@@ -189,9 +202,9 @@ class Command(BaseCommand):
     root.title("Flip Cards")
     root.geometry('1000x600')
     app = App(root)
-    root.bind("1", lambda *args: app.main.rateBad.invoke())
-    root.bind("2", lambda *args: app.main.rateGood.invoke())
-    root.bind("3", lambda *args: app.main.rateExcelent.invoke())
+    root.bind("1", lambda *args: app.main.btnRateBad.invoke())
+    root.bind("2", lambda *args: app.main.btnRateGood.invoke())
+    root.bind("3", lambda *args: app.main.btnRateExcelent.invoke())
     root.bind("0", lambda *args: app.main.switchBack())
     root.mainloop()
 
