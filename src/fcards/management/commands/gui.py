@@ -1,8 +1,17 @@
 from django.core.management.base import BaseCommand
+from django.db.models import Q, Expression, F, DateTimeField, ExpressionWrapper, Value
+from django.db.models.functions import Now
+from django.db.models.expressions import RawSQL
 from fcards import models
 import tkinter as tk
-from tkinter import Tk, ttk
+from tkinter import Tk, ttk, messagebox
+from datetime import datetime
 
+def getCardsQuery():
+    query = models.Card.objects.annotate(learn_time=RawSQL("last_review + interval '1 day' * i", []))
+    # query = query.filter(learn_time__lte=Now())
+    query = query.order_by('learn_time', 'pk')[:500]
+    return query
 
 class Main(ttk.Frame):
   def __init__(self, master=None, **kw):
@@ -15,9 +24,8 @@ class Main(ttk.Frame):
     self.notes = tk.StringVar()
     self.backVisible = False
 
-    self.cards = models.Card.objects.all().order_by('pk')
+    self.cards = getCardsQuery()
     self.index = 0
-
     self.showCurrentCard()
 
     # Widgets:
@@ -41,6 +49,11 @@ class Main(ttk.Frame):
   def showCurrentCard(self):
     card = self.currentCard()
     self.showCard(card)
+
+  def showNextCard(self):
+    self.index += 1
+    self.hideBack()
+    self.showCurrentCard()
 
   def showSelectedHistoryCard(self):
     selection = self.wordsList.curselection()
@@ -70,11 +83,30 @@ class Main(ttk.Frame):
     self.btnRateGood.state(state)
     self.btnRateExcelent.state(state)
 
+  def updateCardState(self, card: models.Card, grade: int):
+    if grade > 0:
+      if card.n == 0:
+        card.i = 1
+      elif card.n == 1:
+        card.i = 3
+      else:
+        card.i = round(card.i * card.ef)
+      card.ef = card.ef + (0.1 - (2 - grade) * (0.08 + (2 - grade) * 0.02))
+      if card.ef < 1.3:
+        card.ef = 1.3
+      card.n += 1
+    else:
+      card.n = 0
+      card.i = 1
+    card.last_review = datetime.now()
+    card.save()
+
   # === Event Handlers, Callbacks
 
   def onRate(self, grade):
-    if self.wordsList.curselection():
+    if self.wordsList.curselection() or self.index >= self.cards.count():
       return
+
     card = self.currentCard()
     ratings = {
       0: 'Incorrect response',
@@ -83,10 +115,13 @@ class Main(ttk.Frame):
     }
     self.lastGrade.set(ratings[grade])
     self.wordsList.insert(0, '{} - {}'.format(card.meaning, card.foreign))
+    self.updateCardState(card, grade)
 
-    self.index += 1
-    self.hideBack()
-    self.showCurrentCard()
+    if self.index >= self.cards.count() - 1:
+      messagebox.showinfo(message='You have done all {} cards'.format(self.cards.count()))
+      self.index += 1
+    else:
+      self.showNextCard()
 
   def onWordsListSelect(self, event):
     self.setStateForRateActions(["disabled"])
@@ -126,11 +161,11 @@ class Main(ttk.Frame):
   def cardControl(self, container):
     frame = ttk.Frame(container, padding=30)
     self.card(frame).grid(column=1, row=1, columnspan=3, sticky='nwes')
-    self.btnRateBad = ttk.Button(frame, text="bad", command=lambda *args: self.onRate(0))
+    self.btnRateBad = ttk.Button(frame, text="(1) Bad", command=lambda *args: self.onRate(0))
     self.btnRateBad.grid(row=2, column=1)
-    self.btnRateGood = ttk.Button(frame, text="good", command=lambda *args: self.onRate(1))
+    self.btnRateGood = ttk.Button(frame, text="(2) Good", command=lambda *args: self.onRate(1))
     self.btnRateGood.grid(row=2, column=2)
-    self.btnRateExcelent = ttk.Button(frame, text="excelent", command=lambda *args: self.onRate(2))
+    self.btnRateExcelent = ttk.Button(frame, text="(3) Excellent", command=lambda *args: self.onRate(2))
     self.btnRateExcelent.grid(row=2, column=3)
     frame.columnconfigure(1, weight=1)
     frame.columnconfigure(2, weight=1)
@@ -146,7 +181,7 @@ class Main(ttk.Frame):
     return frame
 
   def left(self, container):
-    frame = ttk.Labelframe(container, text='Pane1', width=300, height=200, borderwidth=1, relief="ridge")
+    frame = ttk.Labelframe(container, text='Card', width=300, height=200, borderwidth=1, relief="ridge")
     self.cardControl(frame).grid(column=1, row=1, sticky='nwes')
     self.stats(frame).grid(column=1, row=2, sticky='nwes')
     # ttk.Label(frame, text="left").grid()
@@ -155,7 +190,7 @@ class Main(ttk.Frame):
     return frame
 
   def right(self, container):
-    frame = ttk.Labelframe(container, text='Pane2', width=300, height=200, borderwidth=1, relief="ridge")
+    frame = ttk.Labelframe(container, text='History', width=300, height=200, borderwidth=1, relief="ridge")
     self.wordsList = tk.Listbox(frame, height=5)
     self.wordsList.bind("<<ListboxSelect>>", self.onWordsListSelect)
     self.wordsList.grid(column=0, row=0, sticky='nwes')
