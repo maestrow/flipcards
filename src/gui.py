@@ -5,10 +5,25 @@ from tkinter import Tk, ttk
 class Main(ttk.Frame):
   def __init__(self, master=None, **kw):
     ttk.Frame.__init__(self, master, **kw)
+    # Init vars:
+    self.lastGrade = tk.StringVar(value='...')
+    # Widgets:
     self.grid()
     self.createWidgets()
     self.columnconfigure(1, weight=1)
     self.rowconfigure(2, weight=1)
+
+  # Actions
+
+  def rate(self, grade):
+    ratings = {
+      0: 'Incorrect response',
+      1: 'Correct response, after some hesitation',
+      2: 'Perfect recall'
+    }
+    self.lastGrade.set(ratings[grade])
+
+  # Widgets
 
   def card(self, container):
     s = ttk.Style()
@@ -30,9 +45,9 @@ class Main(ttk.Frame):
   def cardControl(self, container):
     frame = ttk.Frame(container, padding=30)
     self.card(frame).grid(column=1, row=1, columnspan=3, sticky='nwes')
-    ttk.Button(frame, text="bad").grid(row=2, column=1)
-    ttk.Button(frame, text="good").grid(row=2, column=2)
-    ttk.Button(frame, text="excelent").grid(row=2, column=3)
+    ttk.Button(frame, text="bad", command=lambda *args: self.rate(0)).grid(row=2, column=1)
+    ttk.Button(frame, text="good", command=lambda *args: self.rate(1)).grid(row=2, column=2)
+    ttk.Button(frame, text="excelent", command=lambda *args: self.rate(2)).grid(row=2, column=3)
     frame.columnconfigure(1, weight=1)
     frame.columnconfigure(2, weight=1)
     frame.columnconfigure(3, weight=1)
@@ -41,7 +56,7 @@ class Main(ttk.Frame):
 
   def stats(self, container):
     frame = ttk.Frame(container, padding=10)
-    ttk.Label(frame, text="stats:").grid()
+    ttk.Label(frame, textvariable=self.lastGrade).grid()
     # frame.columnconfigure(0, weight=1)
     # frame.rowconfigure(0, weight=1)
     return frame
