@@ -39,19 +39,20 @@ class Main(ttk.Frame):
     frame.rowconfigure(1, weight=1)
     return frame
 
-  def cardControl_(self, container):
-    frame = ttk.Frame(container)
-    self.card(frame).grid(sticky='nwes')
-    frame.columnconfigure(0, weight=1)
-    frame.rowconfigure(0, weight=1)
+  def stats(self, container):
+    frame = ttk.Frame(container, padding=10)
+    ttk.Label(frame, text="stats:").grid()
+    # frame.columnconfigure(0, weight=1)
+    # frame.rowconfigure(0, weight=1)
     return frame
 
   def left(self, container):
     frame = ttk.Labelframe(container, text='Pane1', width=300, height=200, borderwidth=1, relief="ridge")
-    self.cardControl(frame).grid(sticky='nwes')
+    self.cardControl(frame).grid(column=1, row=1, sticky='nwes')
+    self.stats(frame).grid(column=1, row=2, sticky='nwes')
     # ttk.Label(frame, text="left").grid()
-    frame.columnconfigure(0, weight=1)
-    frame.rowconfigure(0, weight=1)
+    frame.columnconfigure(1, weight=1)
+    frame.rowconfigure(1, weight=1)
     return frame
 
   def right(self, container):
