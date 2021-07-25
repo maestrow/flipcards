@@ -7,8 +7,17 @@ from tkinter import Tk, ttk
 class Main(ttk.Frame):
   def __init__(self, master=None, **kw):
     ttk.Frame.__init__(self, master, **kw)
+
     # Init vars:
     self.lastGrade = tk.StringVar(value='...')
+    self.front = tk.StringVar()
+    self.back = tk.StringVar()
+
+    self.cards = models.Card.objects.all().order_by('pk')
+    self.index = 0
+
+    self.showCard()
+
     # Widgets:
     self.grid()
     self.createWidgets()
@@ -17,6 +26,11 @@ class Main(ttk.Frame):
 
   # Actions
 
+  def showCard(self):
+    card = self.cards[self.index]
+    self.front.set(card.meaning)
+    self.back.set("{}\n\n{}".format(card.foreign, card.context))
+
   def rate(self, grade):
     ratings = {
       0: 'Incorrect response',
@@ -24,6 +38,8 @@ class Main(ttk.Frame):
       2: 'Perfect recall'
     }
     self.lastGrade.set(ratings[grade])
+    self.index += 1
+    self.showCard()
 
   # Widgets
 
@@ -32,13 +48,8 @@ class Main(ttk.Frame):
     s.configure('Card.TFrame', background='#BBBBBB')   # add background='black' to see frame area
 
     frame = ttk.Frame(container, style='Card.TFrame')
-    ttk.Label(frame, text="foreign").grid(column=1, row=1)
-    text = """
-    oiwjefoiwjef oio ijwoe ifjowef
-    oiwje foiwj efoiwje ofijw eofij
-    pioj oijrgiuehgiquwf pokwef erpogojo
-    """
-    ttk.Label(frame, text=text).grid(column=1, row=2)
+    ttk.Label(frame, textvariable=self.front).grid(column=1, row=1)
+    ttk.Label(frame, textvariable=self.back, wraplength=800).grid(column=1, row=2)
     frame.columnconfigure(1, weight=1)
     frame.rowconfigure(1, weight=1)
     frame.rowconfigure(2, weight=3)
@@ -118,7 +129,7 @@ class Command(BaseCommand):
   def openGui(self):
     root = Tk()
     root.title("Flip Cards")
-    root.geometry('800x600')
+    root.geometry('1000x600')
     app = App(root)
     root.bind("1", lambda *args: app.main.rateBad.invoke())
     root.bind("2", lambda *args: app.main.rateGood.invoke())
