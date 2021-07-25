@@ -18,7 +18,7 @@ class Main(ttk.Frame):
     self.cards = models.Card.objects.all().order_by('pk')
     self.index = 0
 
-    self.showCard()
+    self.showCurrentCard()
 
     # Widgets:
     self.grid()
@@ -26,16 +26,31 @@ class Main(ttk.Frame):
     self.columnconfigure(1, weight=1)
     self.rowconfigure(2, weight=1)
 
+  # Helpers
+
+  def currentCard(self):
+    return self.cards[self.index]
+
   # Actions
 
-  def showCard(self):
-    card = self.cards[self.index]
+  def showCard(self, card):
     self.front.set(card.meaning)
     self.back.set(card.foreign)
     self.notes.set(card.context)
 
+  def showCurrentCard(self):
+    card = self.currentCard()
+    self.showCard(card)
+
+  def showSelectedHistoryCard(self):
+    selection = self.wordsList.curselection()
+    if selection:
+      index = selection[0]
+      card = self.cards[self.index - index - 1]
+      self.showCard(card)
+
   def rate(self, grade):
-    card = self.cards[self.index]
+    card = self.currentCard()
     ratings = {
       0: 'Incorrect response',
       1: 'Correct response, after some hesitation',
@@ -46,7 +61,7 @@ class Main(ttk.Frame):
 
     self.index += 1
     self.hideBack()
-    self.showCard()
+    self.showCurrentCard()
 
   def showBack(self):
     self.lblBack.grid()
@@ -63,6 +78,15 @@ class Main(ttk.Frame):
       self.hideBack()
     else:
       self.showBack()
+
+  def onWordsListSelect(self, event):
+    self.showBack()
+    self.showSelectedHistoryCard()
+
+  def onContinueClick(self, *args):
+    self.wordsList.selection_clear(0, tk.END)
+    self.hideBack()
+    self.showCurrentCard()
 
   # Widgets
 
@@ -120,7 +144,10 @@ class Main(ttk.Frame):
   def right(self, container):
     frame = ttk.Labelframe(container, text='Pane2', width=300, height=200, borderwidth=1, relief="ridge")
     self.wordsList = tk.Listbox(frame, height=5)
+    self.wordsList.bind("<<ListboxSelect>>", self.onWordsListSelect)
     self.wordsList.grid(column=0, row=0, sticky='nwes')
+    self.btnContinue = tk.Button(frame, text="Continue", command=self.onContinueClick)
+    self.btnContinue.grid(column=0, row=2, rowspan=2)
     s = ttk.Scrollbar(frame, orient=tk.VERTICAL, command=self.wordsList.yview)
     s.grid(column=1, row=0, sticky='ns')
     self.wordsList['yscrollcommand'] = s.set
