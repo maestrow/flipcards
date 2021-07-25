@@ -12,6 +12,8 @@ class Main(ttk.Frame):
     self.lastGrade = tk.StringVar(value='...')
     self.front = tk.StringVar()
     self.back = tk.StringVar()
+    self.notes = tk.StringVar()
+    self.backVisible = False
 
     self.cards = models.Card.objects.all().order_by('pk')
     self.index = 0
@@ -29,17 +31,38 @@ class Main(ttk.Frame):
   def showCard(self):
     card = self.cards[self.index]
     self.front.set(card.meaning)
-    self.back.set("{}\n\n{}".format(card.foreign, card.context))
+    self.back.set(card.foreign)
+    self.notes.set(card.context)
 
   def rate(self, grade):
+    card = self.cards[self.index]
     ratings = {
       0: 'Incorrect response',
       1: 'Correct response, after some hesitation',
       2: 'Perfect recall'
     }
     self.lastGrade.set(ratings[grade])
+    self.wordsList.insert(0, '{} - {}'.format(card.meaning, card.foreign))
+
     self.index += 1
+    self.hideBack()
     self.showCard()
+
+  def showBack(self):
+    self.lblBack.grid()
+    self.lblNotes.grid()
+    self.backVisible = True
+
+  def hideBack(self):
+    self.lblBack.grid_remove()
+    self.lblNotes.grid_remove()
+    self.backVisible = False
+
+  def switchBack(self):
+    if self.backVisible:
+      self.hideBack()
+    else:
+      self.showBack()
 
   # Widgets
 
@@ -48,11 +71,19 @@ class Main(ttk.Frame):
     s.configure('Card.TFrame', background='#BBBBBB')   # add background='black' to see frame area
 
     frame = ttk.Frame(container, style='Card.TFrame')
-    ttk.Label(frame, textvariable=self.front).grid(column=1, row=1)
-    ttk.Label(frame, textvariable=self.back, wraplength=800).grid(column=1, row=2)
+    self.lblFront = ttk.Label(frame, textvariable=self.front)
+    self.lblFront.grid(column=1, row=1)
+    self.lblBack = ttk.Label(frame, textvariable=self.back)
+    self.lblBack.grid(column=1, row=2)
+    self.lblNotes = ttk.Label(frame, textvariable=self.notes, wraplength=600)
+    self.lblNotes.grid(column=1, row=3)
+
+    self.hideBack()
+
     frame.columnconfigure(1, weight=1)
     frame.rowconfigure(1, weight=1)
-    frame.rowconfigure(2, weight=3)
+    frame.rowconfigure(2, weight=1)
+    frame.rowconfigure(3, weight=3)
     return frame
 
   def cardControl(self, container):
@@ -88,15 +119,15 @@ class Main(ttk.Frame):
 
   def right(self, container):
     frame = ttk.Labelframe(container, text='Pane2', width=300, height=200, borderwidth=1, relief="ridge")
-    list = tk.Listbox(frame, height=5)
-    list.grid(column=0, row=0, sticky='nwes')
-    s = ttk.Scrollbar(frame, orient=tk.VERTICAL, command=list.yview)
+    self.wordsList = tk.Listbox(frame, height=5)
+    self.wordsList.grid(column=0, row=0, sticky='nwes')
+    s = ttk.Scrollbar(frame, orient=tk.VERTICAL, command=self.wordsList.yview)
     s.grid(column=1, row=0, sticky='ns')
-    list['yscrollcommand'] = s.set
+    self.wordsList['yscrollcommand'] = s.set
     frame.columnconfigure(0, weight=1)
     frame.rowconfigure(0, weight=1)
-    for i in range(1, 101):
-      list.insert('end', 'Line %d of 100' % i)
+    # for i in range(1, 101):
+    #   self.wordsList.insert('end', 'Line %d of 100' % i)
 
     return frame
 
@@ -134,6 +165,7 @@ class Command(BaseCommand):
     root.bind("1", lambda *args: app.main.rateBad.invoke())
     root.bind("2", lambda *args: app.main.rateGood.invoke())
     root.bind("3", lambda *args: app.main.rateExcelent.invoke())
+    root.bind("0", lambda *args: app.main.switchBack())
     root.mainloop()
 
   def handle(self, *args, **kwargs):
