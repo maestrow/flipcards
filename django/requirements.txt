@@ -1,6 +1,7 @@
 asgiref==3.4.1
 autopep8==1.5.7
 Django==3.2.5
+django-cors-headers==3.7.0
 Faker==8.10.2
 flake8==3.9.2
 mccabe==0.6.1
