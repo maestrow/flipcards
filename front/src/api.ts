@@ -30,7 +30,9 @@ export class Api {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
+      // https://stackoverflow.com/questions/63157089/sending-post-request-with-fetch-after-closing-the-browser-with-beforeunload
+      keepalive: true // this is important!
     }).then(res => res.json())
   }
   

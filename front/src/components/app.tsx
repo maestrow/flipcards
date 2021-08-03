@@ -30,13 +30,19 @@ const modalActions: Array<[string, string|null]> = [
 
 export class App extends React.Component<{}, IState> {
 
-  componentDidMount () {
+  componentDidMount = () => {
+    const self = this;
     document.addEventListener('mouseup', this.onMouseEvent);
     document.addEventListener('dblclick', this.onMouseEvent);
+    window.addEventListener('beforeunload', function (e) {
+      e.preventDefault();
+      // https://stackoverflow.com/questions/63157089/sending-post-request-with-fetch-after-closing-the-browser-with-beforeunload
+      self.sync();
+    }, {capture: true});
     this.fetch();
   }
 
-  componentWillUnmount () {
+  componentWillUnmount = () => {
     document.removeEventListener('mouseup', this.onMouseEvent);
     document.removeEventListener('dblclick', this.onMouseEvent);
   }
@@ -112,7 +118,7 @@ export class App extends React.Component<{}, IState> {
     this.setState({list: []})
   }
 
-  onSync = () => {
+  sync = () => {
     api.sync(this.state.list).then(res => {
       this.setState({ list: res.terms })
     });
@@ -128,7 +134,7 @@ export class App extends React.Component<{}, IState> {
         <SidePanel 
           list={st.list} 
           onClear={this.onListClear}
-          onSync={this.onSync}
+          onSync={this.sync}
         />
         <Modal onAction={this.onModalAction} show={st.modalVisible} actions={modalActions}>
           <DataForm text={st.selection} loading={st.translationLoading} result={st.translation} />
