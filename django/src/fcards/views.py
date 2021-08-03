@@ -59,7 +59,7 @@ def update(data: dict) -> models.Deck:
     )
   return deck
 
-def read(deck: models.Deck):
+def toJson(deck: models.Deck) -> dict:
   terms = []
   for card in deck.cards.all():
     terms.append({
@@ -73,11 +73,31 @@ def read(deck: models.Deck):
     "terms": terms
   }
 
+def getDeckJson(url: str) -> dict:
+  result: dict
+  try:
+    deck = models.Deck.objects.prefetch_related('cards').get(url=url)
+    result = toJson(deck)
+  except models.Deck.DoesNotExist:
+    resutl = {
+      "url": url,
+      "description": '',
+      "terms": []
+    }
+  return result
+
 @csrf_exempt
 def sync(request: HttpRequest):
   text = request.body.decode('utf8')
   data = json.loads(text)
   deck = update(data)
-  deck.refresh_from_db()
-  result = read(deck)
+  result = getDeckJson(deck.url)
+  return JsonResponse(result)
+
+
+@csrf_exempt
+def fetch(request: HttpRequest):
+  text = request.body.decode('utf8')
+  data = json.loads(text)
+  result = getDeckJson(data['url'])
   return JsonResponse(result)

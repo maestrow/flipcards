@@ -9,7 +9,9 @@ import { ICancelablePromise, makeCancelable } from '../cancelable-promise';
 import { ITerm } from '../models';
 import { fakeData } from '../fake-data';
 import { getText, getParagraph, getSentence } from 'get-selection-more'
-import { sync } from '../sync';
+import { Api } from '../api';
+
+const api = new Api();
 
 interface IState {
   modalVisible: boolean,
@@ -31,6 +33,7 @@ export class App extends React.Component<{}, IState> {
   componentDidMount () {
     document.addEventListener('mouseup', this.onMouseEvent);
     document.addEventListener('dblclick', this.onMouseEvent);
+    this.fetch();
   }
 
   componentWillUnmount () {
@@ -41,10 +44,16 @@ export class App extends React.Component<{}, IState> {
   state: IState = {
     modalVisible: false,
     translationLoading: false,
-    list: fakeData
+    list: []
   }
 
   job?: ICancelablePromise<any>
+
+  fetch = () => {
+    api.fetch().then(res => {
+      this.setState({ list: res.terms })
+    });
+  }
 
   onMouseEvent = (event: MouseEvent) => {
     if (event.ctrlKey) {
@@ -104,7 +113,9 @@ export class App extends React.Component<{}, IState> {
   }
 
   onSync = () => {
-    sync(this.state.list)
+    api.sync(this.state.list).then(res => {
+      this.setState({ list: res.terms })
+    });
   }
 
   render() {
