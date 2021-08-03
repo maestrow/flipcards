@@ -3,6 +3,7 @@
   box-shadow: 0px 1px 7px 2px #dddddd;
   background: lightgray;
   position: fixed;
+  z-index: 99999999;
   top: 30px;
   right: 10px;
   width: min(40vw, 500px);

@@ -3,12 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "build:prod": "cross-env NODE_ENV=production node scripts/build.js",
-    "build": "cross-env NODE_ENV=development node scripts/build.js",
-    "start": "cross-env NODE_ENV=development node scripts/dev.js",
-    "fake-gen": "node scripts/fake-gen.js"
-  },
+  "scripts": {},
   "author": "",
   "license": "ISC",
   "devDependencies": {
@@ -19,7 +14,8 @@
     "esbuild": "^0.12.16",
     "esbuild-css-modules-plugin": "^1.0.6",
     "faker": "^5.5.3",
-    "typescript": "^4.3.5"
+    "typescript": "^4.3.5",
+    "web-ext": "^6.2.0"
   },
   "dependencies": {
     "@types/react": "^17.0.15",
