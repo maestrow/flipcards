@@ -1,3 +1,4 @@
+// https://stackoverflow.com/questions/26714426/what-is-the-meaning-of-google-translate-query-params
 import { makeCancelable } from "./cancelable-promise";
 
 const urlTpl = "https://translate.googleapis.com/translate_a/single?dt=t&dt=bd&dt=qc&dt=rm&dt=ex&client=gtx&hl=ru&sl=auto&tl=ru&q=handbook&dj=1"
