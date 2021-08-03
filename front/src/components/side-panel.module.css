@@ -1,0 +1,93 @@
+.root {
+  padding: 5px;
+  box-shadow: 0px 1px 7px 2px #dddddd;
+  background: lightgray;
+  position: fixed;
+  top: 30px;
+  right: 10px;
+  width: min(40vw, 500px);
+}
+
+.root-collapsed {
+  width: auto;
+}
+
+/* === Tabs === */
+
+.tab-panel {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.tab {
+  /* button reset */
+  border: none;
+  width: auto;
+  overflow: visible;
+  color: inherit;
+  font: inherit;
+  line-height: normal;
+  text-align: inherit;
+  outline: none;
+  /* end: button reset */
+
+  margin: 5px;
+  padding: 5px;
+  border-bottom: 3px transparent solid;
+  cursor: pointer;
+}
+
+.tab:hover {
+  border-bottom: 3px #8c8bc7 solid;
+}
+
+.tab-active {
+  background-color: #c78b8b;
+}
+
+.button-hide {
+  float: right;
+}
+
+.action {
+  float: right;
+  margin-left: 5px;
+}
+
+/* === Common Visibility Modifiers  === */
+
+.visible {
+  display: block;
+}
+
+.hidden {
+  display: none;
+}
+
+/* === List === */
+
+.list {
+  width: 100%
+}
+
+.item {
+
+}
+
+.item-main {
+
+}
+
+
+.item-foreign {
+
+}
+
+.item-meaning {
+
+}
+
+.item-context {
+  font-size: 0.8em;
+  color: dimgray;
+}

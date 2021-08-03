@@ -1,0 +1,33 @@
+{
+  "name": "front",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:prod": "cross-env NODE_ENV=production node scripts/build.js",
+    "build": "cross-env NODE_ENV=development node scripts/build.js",
+    "start": "cross-env NODE_ENV=development node scripts/dev.js",
+    "fake-gen": "node scripts/fake-gen.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.28.5",
+    "@typescript-eslint/parser": "^4.28.5",
+    "browser-sync": "^2.27.5",
+    "cross-env": "^7.0.3",
+    "esbuild": "^0.12.16",
+    "esbuild-css-modules-plugin": "^1.0.6",
+    "faker": "^5.5.3",
+    "typescript": "^4.3.5"
+  },
+  "dependencies": {
+    "@types/react": "^17.0.15",
+    "@types/react-dom": "^17.0.9",
+    "classnames": "^2.3.1",
+    "get-selection-more": "^1.1.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-json-view": "^1.21.3"
+  }
+}

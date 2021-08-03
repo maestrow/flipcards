@@ -1,0 +1,24 @@
+.root {
+
+}
+
+.header {
+
+}
+
+.loader {
+
+}
+
+.result {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.visible {
+  display: block;
+}
+
+.hidden {
+  display: none;
+}
