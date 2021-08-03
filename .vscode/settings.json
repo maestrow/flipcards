@@ -10,7 +10,7 @@
   "python.formatting.autopep8Args": [
     "--indent-size=2"
   ],
-  "python.pythonPath": "/home/andrew/tmp/flipcards/django/venv/bin/python3",
+  "python.pythonPath": "django/venv/bin/python",
   "files.exclude": {
     "**/.git": true,
     "**/__pycache__": true
