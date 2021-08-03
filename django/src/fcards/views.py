@@ -79,7 +79,7 @@ def getDeckJson(url: str) -> dict:
     deck = models.Deck.objects.prefetch_related('cards').get(url=url)
     result = toJson(deck)
   except models.Deck.DoesNotExist:
-    resutl = {
+    result = {
       "url": url,
       "description": '',
       "terms": []
