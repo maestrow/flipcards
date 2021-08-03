@@ -7,22 +7,26 @@ copy-for/ext:
 clean:
 	rm -rf ./dist/*
 
-build/front/prod: copy-for/front
+front/build/prod: copy-for/front
 	NODE_ENV=production node scripts/build.js
 
-build/front: copy-for/front
+front/build: copy-for/front
 	NODE_ENV=development node scripts/build.js
 
-build/ext: copy-for/ext
+front/run: 
+	NODE_ENV=development node scripts/dev.js
+
+ext/build: copy-for/ext
+	NODE_ENV=development node scripts/build.js
+
+ext/pub: copy-for/ext
 	NODE_ENV=development node scripts/build.js
 	web-ext build --source-dir=dist --artifacts-dir=dist/ext --overwrite-dest
 
 # https://extensionworkshop.com/documentation/develop/getting-started-with-web-ext/
-run/ext: build/ext
+ext/run: build/ext
 	web-ext run --source-dir=dist
 
-start: 
-	NODE_ENV=development node scripts/dev.js
 
 fake-gen:
 	node scripts/fake-gen.js
