@@ -5,7 +5,7 @@ const { build } = require('esbuild')
 // Start the Browsersync server
 bs.init({
   server: {
-    baseDir: "public",
+    baseDir: "dist",
     watch: true,
   }
 });

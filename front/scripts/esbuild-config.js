@@ -7,7 +7,7 @@ module.exports = {
   minify: isProd,
   sourcemap: !isProd,
   bundle: true,
-  outfile: './public/bundle.js',
+  outfile: './dist/bundle.js',
   plugins: [
     cssModulesPlugin({
       inject: true, // optional. set to false to not inject generated CSS into <head>, default is true
