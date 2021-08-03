@@ -34,9 +34,9 @@ class Card(models.Model):
 
 class Deck(models.Model):
   created_at = models.DateTimeField(auto_now=True)
-  name = models.CharField(max_length=200, unique=True)
+  name = models.CharField(max_length=200)
   description = models.TextField()
-  url = models.CharField(max_length=2000)
+  url = models.CharField(max_length=2000, unique=True)
   cards = models.ManyToManyField(Card)
 
   class Meta:
