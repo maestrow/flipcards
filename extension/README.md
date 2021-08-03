@@ -1,2 +1,0 @@
-- https://dev.to/bayardlouis470/create-chrome-extension-in-react-3pna
-- 
