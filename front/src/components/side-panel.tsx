@@ -20,7 +20,7 @@ interface IState {
 export class SidePanel extends React.Component<IProps, IState> {
 
   state: IState = {
-    visible: true,
+    visible: false,
     activeTab: "tab-main"
   }
 
@@ -61,7 +61,12 @@ export class SidePanel extends React.Component<IProps, IState> {
 
     return (
       <div className={cn(css.root, {[css.rootCollapsed]: !st.visible})}>
-        <button className={css.buttonHide} onClick={this.switchVisibility}>Show/Hide</button>
+        <div className={css.header}>
+          <button className={css.buttonHide} onClick={this.switchVisibility}>Show/Hide</button>
+          <div>
+            {p.list.length}
+          </div>
+        </div>
         <div className={cn(css.panel, cssVis)}>
           <h2>Vocabulary</h2>
           <div>
