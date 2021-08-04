@@ -1,0 +1,3 @@
+- `:host { all: initial }` https://stackoverflow.com/questions/47189985/shadow-dom-inheriting-parent-page-css-chrome
+- https://apitman.com/3/#chrome-extension-content-script-stylesheet-isolation
+- https://lamplightdev.com/blog/2019/03/26/why-is-my-web-component-inheriting-styles/
