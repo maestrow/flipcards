@@ -6,15 +6,17 @@ from fcards import models
 import tkinter as tk
 from tkinter import Tk, ttk, messagebox
 from datetime import datetime
+import argparse
 
 def getCardsQuery():
     query = models.Card.objects.annotate(learn_time=RawSQL("last_review + interval '1 day' * i", []))
     # query = query.filter(learn_time__lte=Now())
+    query = query.filter(deck__id__in=[130])
     query = query.order_by('learn_time', 'pk')[:500]
     return query
 
 class Main(ttk.Frame):
-  def __init__(self, master=None, **kw):
+  def __init__(self, master, options, **kw):
     ttk.Frame.__init__(self, master, **kw)
 
     # Init vars:
@@ -33,6 +35,13 @@ class Main(ttk.Frame):
     self.createWidgets()
     self.columnconfigure(1, weight=1)
     self.rowconfigure(2, weight=1)
+
+    if options['learn']:
+      for c in self.cards:
+        self.wordsList.insert(0, '{} - {}'.format(c.meaning, c.foreign))
+      self.index = self.cards.count() - 1  # ToDo: Ugly hack
+      self.showCurrentCard()
+      self.index = self.cards.count()
 
   # === Helpers
 
@@ -223,12 +232,11 @@ class Main(ttk.Frame):
 
 
 class App:
-  def __init__(self, root):
+  def __init__(self, root, options):
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
-    self.main = Main(root, padding="30 30 30 30", borderwidth=10, relief="sunken")
+    self.main = Main(root, options, padding="30 30 30 30", borderwidth=10, relief="sunken")
     self.main.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
-
 
 class Command(BaseCommand):
 
@@ -236,12 +244,16 @@ class Command(BaseCommand):
     root = Tk()
     root.title("Flip Cards")
     root.geometry('1000x600')
-    app = App(root)
+    app = App(root, self.options)
     root.bind("1", lambda *args: app.main.btnRateBad.invoke())
     root.bind("2", lambda *args: app.main.btnRateGood.invoke())
     root.bind("3", lambda *args: app.main.btnRateExcelent.invoke())
     root.bind("0", lambda *args: app.main.switchBack())
     root.mainloop()
 
-  def handle(self, *args, **kwargs):
+  def add_arguments(self, parser):
+    parser.add_argument('--learn', action='store_true')
+
+  def handle(self, *args, **options):
+    self.options = options
     self.openGui()
