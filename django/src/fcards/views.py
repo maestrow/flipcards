@@ -12,18 +12,28 @@ def vote(request, question_id):
 
 # sync
 
+def getEmptyResp(url):
+  return {
+    "url": url,
+    "description": '',
+    "terms": []
+  }
+
 def isCardEqual(card: models.Card, term: dict) -> bool:
   if "foreign" not in term or "meaning" not in term:
     return False
   return term["foreign"] == card.foreign and term["meaning"] == card.meaning
 
-def getDeck(url, metas: dict) -> models.Deck:
+def getDeck(data: dict) -> models.Deck:
+  url = data['url']
+  metas: dict = data['metas']
   try:
     deck = models.Deck.objects.prefetch_related('cards').get(url=url)
   except models.Deck.DoesNotExist:
     deck = models.Deck(url=url)
     if 'description' in metas:
       deck.description = metas['description']
+    deck.name = data['title']
     deck.save()
   return deck
 
@@ -39,16 +49,15 @@ def updateCard(deck: models.Deck, foreign, meaning, context) -> models.Card:
     deck.cards.add(card)
 
 def update(data: dict) -> models.Deck:
-  deck = getDeck(data['url'], data['metas'])
+  deck = getDeck(data)
   terms: list[dict] = data['terms']
 
   # delete
-  if len(terms) > 0:  # do not delete if deck is empty (there might be network issue on application start)
-    for card in deck.cards.all():
-      f = list(filter(lambda t: isCardEqual(card, t), terms))
-      if not f:
-        print("removing: {} - {}".format(card.foreign, card.meaning))
-        deck.cards.remove(card)
+  for card in deck.cards.all():
+    f = list(filter(lambda t: isCardEqual(card, t), terms))
+    if not f:
+      print("removing: {} - {}".format(card.foreign, card.meaning))
+      deck.cards.remove(card)
 
   # create / update
   for term in data['terms']:
@@ -80,21 +89,21 @@ def getDeckJson(url: str) -> dict:
     deck = models.Deck.objects.prefetch_related('cards').get(url=url)
     result = toJson(deck)
   except models.Deck.DoesNotExist:
-    result = {
-      "url": url,
-      "description": '',
-      "terms": []
-    }
+    result = getEmptyResp(url)
   return result
 
 @csrf_exempt
 def sync(request: HttpRequest):
   text = request.body.decode('utf8')
   data = json.loads(text)
-  deck = update(data)
-  result = getDeckJson(deck.url)
-  return JsonResponse(result)
-
+  if len(data['terms']) > 0:
+    deck = update(data)
+    result = getDeckJson(deck.url)
+    return JsonResponse(result)
+  else:
+    # do nothing if recieved 0 items is empty
+    # do not delete if deck is empty (there might be network issue on application start)
+    return JsonResponse(getEmptyResp(data['url']))
 
 @csrf_exempt
 def fetch(request: HttpRequest):

@@ -22,6 +22,7 @@ export class Api {
     const data = {
       url: document.location.toString(),
       metas: this.getMetas(),
+      title: document.title,
       terms
     }
   
