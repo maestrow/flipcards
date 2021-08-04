@@ -43,11 +43,12 @@ def update(data: dict) -> models.Deck:
   terms: list[dict] = data['terms']
 
   # delete
-  for card in deck.cards.all():
-    f = list(filter(lambda t: isCardEqual(card, t), terms))
-    if not f:
-      print("removing: {} - {}".format(card.foreign, card.meaning))
-      deck.cards.remove(card)
+  if len(terms) > 0:  # do not delete if deck is empty (there might be network issue on application start)
+    for card in deck.cards.all():
+      f = list(filter(lambda t: isCardEqual(card, t), terms))
+      if not f:
+        print("removing: {} - {}".format(card.foreign, card.meaning))
+        deck.cards.remove(card)
 
   # create / update
   for term in data['terms']:
